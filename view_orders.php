@@ -9,8 +9,22 @@ if (isset($_POST['logout'])) {
     header("location: login.php");
 }
 
+// Check if cancel button is pressed
+if (isset($_POST['cancel'])) {
+    // Ensure that order ID is provided
+    if(isset($_POST['order_id'])) {
+        $order_id = $_POST['order_id'];
+        // Prepare and execute query to update the status of the order to "cancelled"
+        $update_order_status = $conn->prepare("UPDATE `orders` SET status = 'cancelled' WHERE id = ? AND user_id = ?");
+        $update_order_status->execute([$order_id, $user_id]);
+        // Optionally, you can add some success message here
+    } else {
+        // Optionally, handle the case where the order ID is not provided
+    }
+}
 
 ?>  
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +97,8 @@ if (isset($_POST['logout'])) {
                                         <a href="checkout.php?get_id=<?= $fetch_product['id']; ?>" class="btn">Order Again</a>
                                     <?php } else {?>
                                         <form method="post">
-                                            <button type="submit" name="cancel" class="btn" onclick="return confirm('Do You Want To Cancel This Order?')">Cancel Order</button>
+                                        <input type="hidden" name="order_id" value="<?= $fetch_order['id']; ?>">
+    <button type="submit" name="cancel" class="btn" onclick="return confirm('Do You Want To Cancel This Order?')">Cancel Order</button>
                                         </form>
                                     <?php } ?>
                                 </div>
